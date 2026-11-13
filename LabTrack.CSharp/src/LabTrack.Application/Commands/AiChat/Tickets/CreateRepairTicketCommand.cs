@@ -1,6 +1,6 @@
-using MediatR;
+﻿using MediatR;
 
-namespace LabTrack.Application.Commands.Tickets;
+namespace LabTrack.Application.Commands.AiChat.Tickets;
 
 public sealed record CreateRepairTicketCommand : IRequest<Guid>
 {

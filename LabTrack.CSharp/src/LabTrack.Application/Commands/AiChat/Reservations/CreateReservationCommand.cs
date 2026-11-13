@@ -1,6 +1,6 @@
-using MediatR;
+﻿using MediatR;
 
-namespace LabTrack.Application.Commands.Reservations;
+namespace LabTrack.Application.Commands.AiChat.Reservations;
 
 public sealed record CreateReservationCommand : IRequest<Guid>
 {

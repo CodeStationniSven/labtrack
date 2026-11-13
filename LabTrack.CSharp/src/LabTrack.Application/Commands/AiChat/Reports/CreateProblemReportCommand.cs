@@ -1,6 +1,6 @@
-using MediatR;
+﻿using MediatR;
 
-namespace LabTrack.Application.Commands.Reports;
+namespace LabTrack.Application.Commands.AiChat.Reports;
 
 public sealed record CreateProblemReportCommand : IRequest<Guid>
 {

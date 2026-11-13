@@ -1,6 +1,6 @@
-using MediatR;
+﻿using MediatR;
 
-namespace LabTrack.Application.Commands.Replacement;
+namespace LabTrack.Application.Commands.AiChat.Replacement;
 
 public sealed record CreateReplacementCommand : IRequest<Guid>
 {

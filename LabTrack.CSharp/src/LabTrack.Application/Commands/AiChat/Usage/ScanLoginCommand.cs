@@ -1,6 +1,6 @@
-using MediatR;
+﻿using MediatR;
 
-namespace LabTrack.Application.Commands.Usage;
+namespace LabTrack.Application.Commands.AiChat.Usage;
 
 public sealed record ScanLoginCommand : IRequest<Guid>
 {

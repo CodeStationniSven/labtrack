@@ -1,6 +1,6 @@
-using MediatR;
+﻿using MediatR;
 
-namespace LabTrack.Application.Commands.Users;
+namespace LabTrack.Application.Commands.AiChat.Users;
 
 public sealed record CreateUserCommand : IRequest<Guid>
 {

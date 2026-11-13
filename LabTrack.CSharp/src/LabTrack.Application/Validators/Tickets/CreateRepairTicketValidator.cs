@@ -1,5 +1,5 @@
-using FluentValidation;
-using LabTrack.Application.Commands.Tickets;
+﻿using FluentValidation;
+using LabTrack.Application.Commands.AiChat.Tickets;
 
 namespace LabTrack.Application.Validators.Tickets;
 

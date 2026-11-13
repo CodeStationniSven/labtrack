@@ -1,0 +1,12 @@
+﻿# CODEOWNERS - auto-assign reviewers for PRs
+# Format: <pattern> <owner1> <owner2>
+
+# Everything - assign to QA
+* @CodeStationniSven
+
+# Specific paths - assign to specific QA
+/LabTrack.CSharp/        @CodeStationniSven
+/LabTrack.Python/        @CodeStationniSven
+/database/               @CodeStationniSven
+/docker/                 @CodeStationniSven
+/docs/                   @CodeStationniSven

@@ -1,5 +1,5 @@
-using FluentValidation;
-using LabTrack.Application.Commands.Reservations;
+﻿using FluentValidation;
+using LabTrack.Application.Commands.AiChat.Reservations;
 
 namespace LabTrack.Application.Validators.Reservations;
 

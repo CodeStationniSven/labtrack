@@ -1,6 +1,6 @@
-using MediatR;
+﻿using MediatR;
 
-namespace LabTrack.Application.Commands.Auth;
+namespace LabTrack.Application.Commands.AiChat.Auth;
 
 public sealed record LoginCommand : IRequest<string>
 {

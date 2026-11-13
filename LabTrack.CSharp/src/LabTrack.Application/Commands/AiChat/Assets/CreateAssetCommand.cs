@@ -1,6 +1,6 @@
-using MediatR;
+﻿using MediatR;
 
-namespace LabTrack.Application.Commands.Assets;
+namespace LabTrack.Application.Commands.AiChat.Assets;
 
 public sealed record CreateAssetCommand : IRequest<Guid>
 {

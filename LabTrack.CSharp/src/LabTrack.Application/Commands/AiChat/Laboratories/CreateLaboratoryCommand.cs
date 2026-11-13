@@ -1,6 +1,6 @@
-using MediatR;
+﻿using MediatR;
 
-namespace LabTrack.Application.Commands.Laboratories;
+namespace LabTrack.Application.Commands.AiChat.Laboratories;
 
 public sealed record CreateLaboratoryCommand : IRequest<Guid>
 {

@@ -1,5 +1,5 @@
-using FluentValidation;
-using LabTrack.Application.Commands.Laboratories;
+﻿using FluentValidation;
+using LabTrack.Application.Commands.AiChat.Laboratories;
 
 namespace LabTrack.Application.Validators.Laboratories;
 

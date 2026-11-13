@@ -1,6 +1,6 @@
-using MediatR;
+﻿using MediatR;
 
-namespace LabTrack.Application.Commands.Financials;
+namespace LabTrack.Application.Commands.AiChat.Financials;
 
 public sealed record CreateExpenseCommand : IRequest<Guid>
 {

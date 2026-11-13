@@ -1,5 +1,5 @@
-using FluentValidation;
-using LabTrack.Application.Commands.Qr;
+﻿using FluentValidation;
+using LabTrack.Application.Commands.AiChat.Qr;
 
 namespace LabTrack.Application.Validators.Qr;
 

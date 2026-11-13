@@ -1,5 +1,5 @@
-using FluentValidation;
-using LabTrack.Application.Commands.Financials;
+﻿using FluentValidation;
+using LabTrack.Application.Commands.AiChat.Financials;
 
 namespace LabTrack.Application.Validators.Financials;
 

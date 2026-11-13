@@ -120,3 +120,6 @@ string.*
 *.ps1
 !scripts/*.ps1
 !docker/*.ps1
+
+# Allow team workflow script
+!push-update.ps1

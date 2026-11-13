@@ -1,6 +1,6 @@
-using MediatR;
+﻿using MediatR;
 
-namespace LabTrack.Application.Commands.Maintenance;
+namespace LabTrack.Application.Commands.AiChat.Maintenance;
 
 public sealed record CreateMaintenanceCommand : IRequest<Guid>
 {

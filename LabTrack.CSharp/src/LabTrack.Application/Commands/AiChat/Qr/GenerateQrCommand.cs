@@ -1,6 +1,6 @@
-using MediatR;
+﻿using MediatR;
 
-namespace LabTrack.Application.Commands.Qr;
+namespace LabTrack.Application.Commands.AiChat.Qr;
 
 public sealed record GenerateQrCommand : IRequest<Guid>
 {
