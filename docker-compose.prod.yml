@@ -1,0 +1,51 @@
+﻿
+
+version: '3.8'
+
+services:
+  postgres:
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-sven292005}
+    volumes:
+      - postgres_dev_data:/var/lib/postgresql/data
+
+  api:
+    build:
+      context: .
+      dockerfile: src/LabTrack.Api/Dockerfile
+      target: build
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_DETAILEDERRORS: "true"
+      LOG_LEVEL: Debug
+      DB_CONNECTION_STRING: "Host=postgres;Port=5432;Database=labtrack_db;Username=postgres;Password=${POSTGRES_PASSWORD:-sven292005};SearchPath=public,auth,inventory,scheduling,telemetry,maintenance,financial,ai,audit"
+    ports:
+      - "8080:8080"
+      - "5000:5000"
+    volumes:
+      - ./src:/src:ro
+
+  ai-engine:
+    build:
+      context: ./backend/python
+      dockerfile: Dockerfile
+    environment:
+      PYTHON_ENV: development
+      LOG_LEVEL: debug
+      DB_CONNECTION_STRING: "postgresql://postgres:${POSTGRES_PASSWORD:-sven292005}@postgres:5432/labtrack_db"
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend/python:/app:ro
+
+  nginx:
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.dev.conf:/etc/nginx/nginx.conf:ro
+
+volumes:
+  postgres_dev_data:

@@ -1,0 +1,19 @@
+﻿version: "3.9"
+
+services:
+  postgres:
+    ports:
+      - "5432:5432"
+
+  python-ai:
+    volumes:
+      - ./LabTrack.Python/app:/app/app:ro
+    environment:
+      DEBUG: "true"
+      LOG_LEVEL: DEBUG
+
+  api:
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+    volumes:
+      - ./LabTrack.CSharp/src:/src:ro

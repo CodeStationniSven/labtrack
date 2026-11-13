@@ -1,0 +1,24 @@
+LabTrack Enterprise Laboratory Asset Management PlatformLabTrack is a high-performance, secure, multi-tenant enterprise platform built for managing physical laboratory assets, reservation scheduling, real-time hardware telemetry ingestion, maintenance work orders, and AI-assisted diagnostics.1. System ArchitectureLabTrack is designed around Clean Architecture principles and containerized microservices:                                    +-----------------------------------+
+                                    |     Nginx Reverse Proxy Gateway   |
+                                    +-----------------------------------+
+                                                      |
+                                                      | (HTTP / WebSockets)
+                                 +--------------------+--------------------+
+                                 |                                         |
+                                 v                                         v
+                  +---------------------------+             +---------------------------+
+                  |   .NET 8 Backend API      |             |    Python AI RAG Engine   |
+                  |   (Clean Architecture)    |             |   (FastAPI / Embeddings)  |
+                  +---------------------------+             +---------------------------+
+                                 |                                         |
+                                 +--------------------+--------------------+
+                                                      |
+                                                      v
+                                    +-----------------------------------+
+                                    |     PostgreSQL 16 Database        |
+                                    |  (Multi-Schema + RLS + Ledger)    |
+                                    +-----------------------------------+
+Key Components.NET 8 API (Api, Application, Domain, Infrastructure): Core REST services, JWT/MFA auth, FluentValidation, SignalR WebSocket telemetry, Dapper connection factory, and Entity Framework Core repository layer.PostgreSQL 16 Multi-Tenant Engine: Eight dedicated schemas (auth, inventory, scheduling, telemetry, maintenance, financial, ai, audit) with Row-Level Security (RLS) policies and append-only cryptographic forensic audit ledger (audit.forensic_ledger).Python FastAPI AI Engine: Semantic search and RAG engine leveraging sentence-transformers/all-MiniLM-L6-v2 vector embeddings stored in PostgreSQL via pgvector.Nginx Gateway: Gateway reverse proxy providing SSL termination, rate-limiting zones, and WebSocket upgrade proxying.2. Quick Start (Development)PrerequisitesDocker & Docker Compose (24.0+)PowerShell Core / Windows PowerShell.NET 8 SDK & Node.js v20+ (for local CLI tooling and testing)Initial Setup & LaunchClone repository & prepare environment config:Bashcp .env.example .env
+Start supporting infrastructure & backend services:PowerShell.\start-backend.ps1
+Verify running health checks:PowerShell.\health-check.ps1
+API Swagger Documentation: http://localhost:8080/swagger (or http://localhost:5000/swagger)AI Engine Health Endpoint: http://localhost:8000/health3. Operational Scripts ReferenceAll primary operational procedures are managed via standardized PowerShell scripts:ScriptLocationPurposestart-backend.ps1/Spins up PostgreSQL container and launches backend API.stop-backend.ps1/Stops container stack and terminates local .NET processes.health-check.ps1/Executes multi-service container health and HTTP probe checks.rollback.ps1/Emergency rollback tool for production service restoration.deploy.ps1backend/scripts/production/Zero-downtime production deployment and verification.backup.ps1 / restore.ps1backend/scripts/database/AES-256-CBC encrypted schema backup and restore utilities.migrate.ps1 / reset-database.ps1backend/scripts/database/EF Core database migration and development reset tools.verify.ps1backend/scripts/database/Schema object count and forensic audit ledger SHA-256 chain verification.test-all.ps1backend/scripts/testing/Comprehensive execution runner for .NET, Python, and DB tests.test-api.ps1backend/scripts/testing/Automated API HTTP sanity check runner.test-concurrency.ps1backend/scripts/testing/Multithreaded Optimistic Concurrency Control (OCC) conflict test.4. Testing & Security AssuranceFor detailed testing workflows and configuration guides, refer to the suite documentation:End-to-End (E2E) Testing: backend/tests/e2e/README.md (Playwright UI & WebSocket automation)Integration Testing: backend/tests/integration/README.md (xUnit WebApplicationFactory & RLS isolation)Load Testing: backend/tests/load/README.md (k6 performance, spike, and OCC concurrency testing)Security & Vulnerability Auditing: backend/tests/security/README.md (SAST, DAST, and supply chain audits)

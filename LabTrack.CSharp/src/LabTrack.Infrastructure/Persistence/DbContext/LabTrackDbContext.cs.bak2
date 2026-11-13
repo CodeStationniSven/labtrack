@@ -1,0 +1,276 @@
+﻿using System.Reflection;
+using LabTrack.Domain.Entities;
+using LabTrack.Infrastructure.Idempotency;
+using Microsoft.EntityFrameworkCore;
+
+namespace LabTrack.Infrastructure.Persistence.DbContext;
+
+public class LabTrackDbContext : Microsoft.EntityFrameworkCore.DbContext
+{
+    public LabTrackDbContext(DbContextOptions<LabTrackDbContext> options)
+        : base(options)
+    {
+    }
+
+    public DbSet<AiChatMessage> AiChatMessages => Set<AiChatMessage>();
+    public DbSet<AiChatSession> AiChatSessions => Set<AiChatSession>();
+    public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
+    public DbSet<AuthSession> AuthSessions => Set<AuthSession>();
+    public DbSet<Communication> Communications => Set<Communication>();
+    public DbSet<Notification> Notifications => Set<Notification>();
+    public DbSet<IdempotencyRecord> IdempotencyRecords => Set<IdempotencyRecord>();
+
+    public DbSet<Asset> Assets => Set<Asset>();
+    public DbSet<Laboratory> Laboratories => Set<Laboratory>();
+    public DbSet<QrCode> QrCodes => Set<QrCode>();
+    public DbSet<QrSession> QrSessions => Set<QrSession>();
+    public DbSet<Workstation> Workstations => Set<Workstation>();
+    public DbSet<Reservation> Reservations => Set<Reservation>();
+    public DbSet<User> Users => Set<User>();
+
+    public DbSet<MaintenanceRecord> MaintenanceRecords => Set<MaintenanceRecord>();
+    public DbSet<MaintenanceSchedule> MaintenanceSchedules => Set<MaintenanceSchedule>();
+    public DbSet<ProblemReport> ProblemReports => Set<ProblemReport>();
+    public DbSet<RepairTicket> RepairTickets => Set<RepairTicket>();
+    public DbSet<ReplacementRequest> ReplacementRequests => Set<ReplacementRequest>();
+    public DbSet<ChainOfCustodyEvent> ChainOfCustodyEvents => Set<ChainOfCustodyEvent>();
+
+    public DbSet<FinancialExpense> FinancialExpenses => Set<FinancialExpense>();
+    public DbSet<NetworkIncident> NetworkIncidents => Set<NetworkIncident>();
+    public DbSet<NetworkDevice> NetworkDevices => Set<NetworkDevice>();
+    public DbSet<PcUsageLog> PcUsageLogs => Set<PcUsageLog>();
+    public DbSet<InstructorCommunication> InstructorCommunications => Set<InstructorCommunication>();
+    public DbSet<ReplacementRecord> ReplacementRecords => Set<ReplacementRecord>();
+
+        // --- AUTOMATICALLY REGISTERED DOMAIN ENTITIES ---
+    public DbSet<LabTrack.Domain.Entities.ComponentReplacement> ComponentReplacements { get; set; }
+    public DbSet<LabTrack.Domain.Entities.DamageAttribution> DamageAttributions { get; set; }
+    public DbSet<LabTrack.Domain.Entities.FinancialRecord> FinancialRecords { get; set; }
+    public DbSet<LabTrack.Domain.Entities.IdempotencyKey> IdempotencyKeys { get; set; }
+    public DbSet<LabTrack.Domain.Entities.PcTelemetryEvent> PcTelemetryEvents { get; set; }
+    public DbSet<LabTrack.Domain.Entities.RefreshToken> RefreshTokens { get; set; }
+    public DbSet<LabTrack.Domain.Entities.WorkstationSession> WorkstationSessions { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        // ============ GlobalSoftDeleteFilterApplied ============
+        foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+        {
+            var isDeletedProperty = entityType.FindProperty("IsDeleted");
+            if (isDeletedProperty != null && isDeletedProperty.ClrType == typeof(bool))
+            {
+                var parameter   = System.Linq.Expressions.Expression.Parameter(entityType.ClrType, "e");
+                var property    = System.Linq.Expressions.Expression.Property(parameter, "IsDeleted");
+                var notDeleted  = System.Linq.Expressions.Expression.Not(property);
+                var lambda      = System.Linq.Expressions.Expression.Lambda(notDeleted, parameter);
+                modelBuilder.Entity(entityType.ClrType).HasQueryFilter(lambda);
+            }
+        }
+        // =======================================================
+        modelBuilder.HasDefaultSchema("labtrack_schema");
+
+        base.OnModelCreating(modelBuilder);
+
+        modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+
+        modelBuilder.Entity<User>(entity =>
+        {
+            entity.Ignore(u => u.ReceivedTransfers);
+            entity.Ignore(u => u.ReportedDamages);
+            entity.Ignore(u => u.ResponsibleDamages); 
+        });
+
+        modelBuilder.Entity<ChainOfCustodyEvent>(entity =>
+        {
+            entity.Ignore(e => e.ReceivedByUser);
+        });
+
+        modelBuilder.Entity<MaintenanceRecord>(entity =>
+        {
+            entity.HasOne(m => m.Asset)
+                  .WithMany(a => a.MaintenanceRecords)
+                  .HasForeignKey(m => m.AssetId)
+                  .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(m => m.PerformedByUser)
+                  .WithMany(u => u.MaintenanceRecords)
+                  .HasForeignKey(m => m.PerformedByUserId)
+                  .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<MaintenanceSchedule>(entity =>
+        {
+            entity.HasOne(m => m.Asset)
+                  .WithMany()
+                  .HasForeignKey(m => m.AssetId)
+                  .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(m => m.AssignedToUser)
+                  .WithMany(u => u.AssignedMaintenanceSchedules)
+                  .HasForeignKey(m => m.AssignedToUserId)
+                  .OnDelete(DeleteBehavior.SetNull);
+        });
+
+        modelBuilder.Entity<PcUsageLog>(entity =>
+        {
+            entity.HasOne(p => p.User)
+                  .WithMany(u => u.PcUsageLogs)
+                  .HasForeignKey(p => p.UserId)
+                  .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(p => p.Workstation)
+                  .WithMany()
+                  .HasForeignKey(p => p.WorkstationId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<ProblemReport>(entity =>
+        {
+            entity.HasOne(p => p.ReportedByUser)
+                  .WithMany(u => u.ProblemReports)
+                  .HasForeignKey(p => p.ReportedByUserId)
+                  .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(p => p.Asset)
+                  .WithMany()
+                  .HasForeignKey(p => p.AssetId)
+                  .OnDelete(DeleteBehavior.SetNull);
+
+            entity.HasOne(p => p.Laboratory)
+                  .WithMany()
+                  .HasForeignKey(p => p.LaboratoryId)
+                  .OnDelete(DeleteBehavior.SetNull);
+
+            entity.HasOne(p => p.Workstation)
+                  .WithMany()
+                  .HasForeignKey(p => p.WorkstationId)
+                  .OnDelete(DeleteBehavior.SetNull);
+        });
+
+        modelBuilder.Entity<RepairTicket>(entity =>
+        {
+            entity.HasOne(t => t.ReportedByUser)
+                  .WithMany(u => u.ReportedRepairTickets)
+                  .HasForeignKey(t => t.ReportedByUserId)
+                  .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(t => t.AssignedToUser)
+                  .WithMany(u => u.AssignedRepairTickets)
+                  .HasForeignKey(t => t.AssignedToUserId)
+                  .OnDelete(DeleteBehavior.SetNull);
+
+            entity.HasOne(t => t.Asset)
+                  .WithMany(a => a.RepairTickets)
+                  .HasForeignKey(t => t.AssetId)
+                  .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<ReplacementRequest>(entity =>
+        {
+            entity.HasOne(r => r.RequestedByUser)
+                  .WithMany(u => u.RequestedReplacements)
+                  .HasForeignKey(r => r.RequestedByUserId)
+                  .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(r => r.ApprovedByUser)
+                  .WithMany(u => u.ApprovedReplacements)
+                  .HasForeignKey(r => r.ApprovedByUserId)
+                  .OnDelete(DeleteBehavior.SetNull);
+
+            entity.HasOne(r => r.Asset)
+                  .WithMany()
+                  .HasForeignKey(r => r.AssetId)
+                  .OnDelete(DeleteBehavior.Restrict);
+        });
+
+                // FIX: Workstation table is singular "Workstation" (not "Workstations")
+        modelBuilder.Entity<Workstation>(entity =>
+        {
+            entity.ToTable("Workstation");
+        });
+
+                // QrSession explicit table mapping (table is singular)
+        modelBuilder.Entity<QrSession>(entity =>
+        {
+            entity.ToTable("QrSession");
+        });
+
+        modelBuilder.Entity<Reservation>(entity =>
+        {
+            entity.HasOne(r => r.User)
+                  .WithMany(u => u.Reservations)
+                  .HasForeignKey(r => r.UserId)
+                  .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(r => r.Laboratory)
+                  .WithMany(l => l.Reservations)
+                  .HasForeignKey(r => r.LaboratoryId)
+                  .OnDelete(DeleteBehavior.Restrict);
+        });
+    }
+
+    public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        UpdateAuditTimestamps();
+        return base.SaveChangesAsync(cancellationToken);
+    }
+
+    public override int SaveChanges()
+    {
+        UpdateAuditTimestamps();
+        return base.SaveChanges();
+    }
+
+    private void UpdateAuditTimestamps()
+    {
+        var entries = ChangeTracker.Entries()
+            .Where(e => e.State is EntityState.Added or EntityState.Modified);
+
+        var utcNow = DateTime.UtcNow;
+
+        foreach (var entry in entries)
+        {
+            if (entry.State == EntityState.Added)
+            {
+                if (entry.HasProperty("CreatedAtUtc"))
+                {
+                    entry.Property("CreatedAtUtc").CurrentValue = utcNow;
+                }
+            }
+
+            if (entry.State == EntityState.Modified)
+            {
+                if (entry.HasProperty("LastModifiedAtUtc"))
+                {
+                    entry.Property("LastModifiedAtUtc").CurrentValue = utcNow;
+                }
+            }
+        }
+    }
+}
+
+internal static class EntityEntryExtensions
+{
+    public static bool HasProperty(this Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry entry, string propertyName)
+    {
+        return entry.Properties.Any(p => p.Metadata.Name == propertyName);
+    }
+
+        // --- AUTOMATICALLY REGISTERED DOMAIN ENTITIES ---
+        
+        
+        
+        
+        
+        
+        
+
+}
+
+
+
+
+
+
+
+

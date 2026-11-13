@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/LabTrack.Api/LabTrack.Api.csproj" />
+    <Project Path="src/LabTrack.Application/LabTrack.Application.csproj" />
+    <Project Path="src/LabTrack.Domain/LabTrack.Domain.csproj" />
+    <Project Path="src/LabTrack.Infrastructure/LabTrack.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/LabTrack.Tests/LabTrack.Tests.csproj" />
+  </Folder>
+</Solution>

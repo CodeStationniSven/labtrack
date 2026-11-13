@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="LabTrack.Api/LabTrack.Api.csproj" />
+  <Project Path="LabTrack.Application/LabTrack.Application.csproj" />
+  <Project Path="LabTrack.Domain/LabTrack.Domain.csproj" />
+  <Project Path="LabTrack.Infrastructure/LabTrack.Infrastructure.csproj" />
+</Solution>

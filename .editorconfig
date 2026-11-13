@@ -1,0 +1,69 @@
+﻿# LabTrack Enterprise Editor Configuration
+# http://editorconfig.org
+
+root = true
+
+# All files
+[*]
+indent_style = space
+indent_size = 4
+end_of_line = lf
+charset = utf-8
+trim_trailing_whitespace = true
+insert_final_newline = true
+
+# C# Code Conventions (.NET 8)
+[*.cs]
+# Indentation
+indent_style = space
+indent_size = 4
+
+# Organize Usings
+dotnet_separate_import_directive_groups = false
+dotnet_sort_system_directives_first = true
+
+# Style Rules
+csharp_style_var_for_built_in_types = true:suggestion
+csharp_style_var_when_type_is_apparent = true:suggestion
+csharp_style_expression_bodied_methods = when_on_single_line:suggestion
+csharp_style_expression_bodied_constructors = false:silent
+csharp_style_expression_bodied_properties = true:suggestion
+
+# Naming Conventions
+dotnet_naming_rule.interface_should_start_with_i.severity = warning
+dotnet_naming_rule.interface_should_start_with_i.symbols = interface
+dotnet_naming_rule.interface_should_start_with_i.style = setting_interface_style
+
+dotnet_naming_symbols.interface.applicable_kinds = interface
+dotnet_naming_style.setting_interface_style.capitalization = pascal_case
+dotnet_naming_style.setting_interface_style.required_prefix = I
+
+# Formatting Rules
+csharp_new_line_before_open_brace = methods, properties, types
+csharp_new_line_before_else = true
+csharp_new_line_before_catch = true
+csharp_new_line_before_finally = true
+
+# PowerShell Scripts
+[*.ps1]
+indent_style = space
+indent_size = 4
+end_of_line = crlf
+
+# Python Source Files
+[*.py]
+indent_style = space
+indent_size = 4
+end_of_line = lf
+
+# Web & Markup Files
+[*.{json,yml,yaml,xml,md}]
+indent_style = space
+indent_size = 2
+end_of_line = lf
+
+# Docker & Shell Scripts
+[{Dockerfile,*.sh}]
+indent_style = space
+indent_size = 4
+end_of_line = lf
